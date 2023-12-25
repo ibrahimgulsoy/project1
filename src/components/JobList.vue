@@ -1,10 +1,12 @@
 <template>
   <div class="job-list">
-    <ul>
-      <li v-for="job in props.jobs" :key="job.id">
+    <p>Ordered by {{ order }}</p>
+    <transition-group name="list" tag="ul">
+      <li v-for="job in orderedJobs" :key="job.id">
         {{ job.title }} - {{ job.location }} - Salary: {{ job.salary }}
         <h2>{{ job.title }} in {{ job.location }}</h2>
-        <div class=" salary " >
+        <div class="salary">
+          <img src="../assets/rupee.svg" alt="rupee icon">
           <p>{{ job.salary }} ruppes</p>
         </div>
         <div class="description"></div>
@@ -15,14 +17,33 @@
           quia.
         </p>
       </li>
-    </ul>
+    </transition-group>
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps } from "vue";
-const props = defineProps(["jobs"]);
+import type Job from "@/types/Job";
+import { defineProps, PropType, computed } from "vue";
+
+const props = defineProps({
+  jobs: {
+    required: true,
+    type: Array as PropType<Job[]>,
+  },
+  order: {
+    required: true,
+    type: String as PropType<string>,
+  },
+});
+
+const orderedJobs = computed(() => {
+  return [...props.jobs].sort((a: Job, b: Job) => {
+    return a[props.order] > b[props.order] ? 1 : -1;
+  });
+});
+
 </script>
+
 <style scoped>
 .job-list {
   max-width: 960px;
@@ -52,5 +73,8 @@ const props = defineProps(["jobs"]);
   color: #17bf66;
   font-weight: bold;
   margin: 10px 4px;
+}
+.list-move{
+transition: all 1s;
 }
 </style>
